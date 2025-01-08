@@ -1,23 +1,17 @@
 // Copyright 2021 Google LLC
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//    https://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+// https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
+// <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
+// option. This file may not be copied, modified, or distributed
+// except according to those terms.
 
 // This example shows some Rust subclasses of C++ classes.
 
 mod billy;
 mod uwu;
 
-use autocxx::include_cpp;
+use autocxx::prelude::*;
 use autocxx::subclass::prelude::*;
 use cxx::CxxString;
 use std::cell::RefCell;
@@ -40,7 +34,7 @@ include_cpp! {
 // See the main function at the bottom for how this subclass
 // is instantiated.
 
-#[is_subclass(superclass("MessageDisplayer"))]
+#[subclass(superclass("MessageDisplayer"))]
 #[derive(Default)]
 pub struct UwuDisplayer {}
 
@@ -66,7 +60,7 @@ impl ffi::MessageDisplayer_methods for UwuDisplayer {
 // for now, at least, we can't hold non-trivial C++ objects on the Rust stack.)
 // All the boxing and unboxing is done automatically by autocxx layers.
 
-#[is_subclass(superclass("MessageProducer"))]
+#[subclass(superclass("MessageProducer"))]
 #[derive(Default)]
 pub struct QuoteProducer;
 
@@ -99,7 +93,7 @@ impl ffi::MessageProducer_methods for QuoteProducer {
 // doing stuff. In C++ you'd probably need a const_cast. Here we use
 // interior mutability.
 
-#[is_subclass(superclass("MessageDisplayer"))]
+#[subclass(superclass("MessageDisplayer"))]
 pub struct BoxDisplayer {
     message_count: RefCell<usize>,
 }
@@ -109,7 +103,7 @@ impl BoxDisplayer {
         Self::new_rust_owned(Self {
             // As we're allocating this class ourselves instead of using [`Default`]
             // we need to initialize the `cpp_peer` member ourselves. This member is
-            // inserted by the `#[is_subclass]` annotation. autocxx will
+            // inserted by the `#[subclass]` annotation. autocxx will
             // later use this to store a pointer back to the C++ peer.
             cpp_peer: Default::default(),
             message_count: RefCell::new(1usize),
